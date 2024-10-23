@@ -3,7 +3,7 @@ on: workflow_dispatch                     # By using on it  manually trigger the
 
 jobs:                                     # we need to add jobs
   first-job:                              # This just give jobs name
-    runs-on: ubuntu-latest                # This is cloud hosted runners (linux,windows,mac)
+    runs-on: ubuntu-24.04               # This is cloud hosted runners (linux,windows,mac)
     steps:                                # we need to mention steps
       - name: Print Greating              # we need to give name of the step
         run: echo "Hello world!"          # we can use shell cmd / action
