@@ -1,0 +1,12 @@
+name: first-action                        # This is name of the workflow we can give any Name.
+on: workflow_dispatch                     # By using on it  manually trigger the event/events
+
+jobs:                                     # we need to add jobs
+  first-job:                              # This just give jobs name
+    runs-on: ubuntu-latest                # This is cloud hosted runners (linux,windows,mac)
+    steps:                                # we need to mention steps
+      - name: Print Greating              # we need to give name of the step
+        run: echo "Hello world!"          # we can use shell cmd / action
+
+      - name: Print GoodBye
+        run: echo "Done -bye!"
