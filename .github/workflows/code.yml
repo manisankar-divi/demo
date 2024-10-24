@@ -11,6 +11,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    - name: Test API Connectivity
+      run: |
+        curl -k https://172.31.3.128:6443/api
+
     - uses: actions-hub/kubectl@master
       env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
