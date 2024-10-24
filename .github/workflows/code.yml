@@ -11,27 +11,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Create SSH Tunnel
+        run: |
+          ssh -o StrictHostKeyChecking=no -N -L 6443:localhost:6443 user@3.110.114.164 -i ~/.ssh/id_rsa &
+          sleep 5  # Wait for the tunnel to establish
 
       - name: Create kubeconfig
         run: |
           mkdir -p ${HOME}/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
           chmod 600 ${HOME}/.kube/config
-      
+
       - name: Verify kubeconfig size
         run: |
           echo "Kubeconfig size: $(wc -c < ${HOME}/.kube/config)"
-          cat ${HOME}/.kube/config  # Uncomment to see the content (only for debugging)
-      
-      - name: Validate kubeconfig
-        run: |
-          kubectl config view
-          kubectl config get-contexts
-
-      - name: Test API Connectivity
-        run: |
-          kubectl get all -A
-
+          
       - name: Deploy to K8s
         run: |
-          kubectl apply -f ./
+          kubectl config set-cluster kubernetes --server=https://localhost:6443
+          kubectl get all -A  # Test connectivity
