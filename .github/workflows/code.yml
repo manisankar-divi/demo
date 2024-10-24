@@ -19,18 +19,28 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Install kubectl
+      - name: Update apt repository
+        run: sudo apt-get update -y
+
+      - name: Install prerequisites
+        run: sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
+
+      - name: Add Kubernetes APT key
         run: |
-                sudo apt-get update -y
-                sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
-                sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-                sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-                sudo echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-                sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
-                sudo apt-get update
-                sudo apt-get install -y kubectl
-                sudo kubectl version
-      - run: ls -la
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+      - name: Add Kubernetes APT repository
+        run: |
+          echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+      - name: Update apt repository again
+        run: sudo apt-get update
+
+      - name: Install kubectl
+        run: sudo apt-get install -y kubectl
+
+      - name: Check kubectl version
+        run: kubectl version --client
 
       - name: Apply Kubernetes manifests
         run: |
