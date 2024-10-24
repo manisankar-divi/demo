@@ -1,12 +1,40 @@
-name: first-action                        # This is name of the workflow we can give any Name.
-on: workflow_dispatch                     # By using on it  manually trigger the event/events
+name: Deploy to Kubeadm
 
-jobs:                                     # we need to add jobs
-  first-job:                              # This just give jobs name
-    runs-on: ubuntu-24.04               # This is cloud hosted runners (linux,windows,mac)
-    steps:                                # we need to mention steps
-      - name: Print Greating              # we need to give name of the step
-        run: echo "Hello world!"          # we can use shell cmd / action
+on:
+  push:
+    branches:
+      - main
 
-      - name: Print GoodBye
-        run: echo "Done -bye!"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - run: ls -la
+
+      # Optional: Set up SSH if needed for extra access
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Use the Kubeconfig stored in secrets to interact with AWS Kubeadm
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+      # Deploy pods to Kubernetes cluster
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f namespace.yaml
+          kubectl apply -f configmap.yaml
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          kubectl apply -f hpa.yaml
+
+      # Verify the deployment
+      - name: Verify deployment
+        run: kubectl get pods
