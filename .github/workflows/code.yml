@@ -11,9 +11,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Test API Connectivity
+    - name: Validate kubeconfig
       run: |
-        curl -k https://172.31.3.128:6443/api
+        kubectl config view
+        kubectl config get-contexts
+
 
     - uses: actions-hub/kubectl@master
       env:
