@@ -2,50 +2,21 @@ name: Deploy to Kubernetes
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
+    name: Deploy to Kubernetes
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
-      - name: Update apt repository
-        run: sudo apt-get update -y
-
-      - name: Install prerequisites
-        run: sudo apt-get install -y apt-transport-https ca-certificates curl
-
-      - name: Add Kubernetes APT key
-        run: |
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes.gpg
-
-      - name: Add Kubernetes APT repository
-        run: |
-          echo "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-      - name: Update apt repository again
-        run: sudo apt-get update
-
-      - name: Install kubectl
-        run: sudo apt-get install -y kubectl
-
-      - name: Check kubectl version
-        run: kubectl version --client
-      
-
-      - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f namespace.yaml
-          kubectl apply -f configmap.yaml
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
-          kubectl apply -f hpa.yaml
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Create kubeconfig
+      run: |
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config
+    - name: Use context
+      run: kubectl config use-context octobay-api
+    - name: Deploy to K8s
+      run: kubectl apply -f ./
