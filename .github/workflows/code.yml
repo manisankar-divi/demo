@@ -19,7 +19,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+          
+      - uses: imajeetyadav/kubectl@v1
+      - run: kubectl get pods
       # Use the Kubeconfig stored in secrets to interact with AWS Kubeadm
       - name: Set up kubeconfig
         run: |
