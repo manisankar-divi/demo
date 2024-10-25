@@ -1,30 +1,49 @@
-name: Deploy to Kubeadm Kubernetes Cluster
+name: Deploy to Kubernetes
 
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main  # Adjust as needed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Kubeconfig
-      env:
-        KUBECONFIG_FILE: ${{ secrets.KUBECONFIG_FILE }}
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${KUBECONFIG_FILE}" | base64 --decode > $HOME/.kube/config
-        
-    - name: Install kubectl
-      run: |
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x ./kubectl
-        sudo mv ./kubectl /usr/local/bin/kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
 
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f ./
+      - name: Deploy to Kubernetes
+        env:
+          KUBE_HOST: ${{ secrets.KUBE_HOST }}
+          KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
+          KUBE_CERTIFICATE: ${{ secrets.KUBE_CERTIFICATE }} # Optional, remove if not using
+        run: |
+          echo "Setting up Kubernetes config"
+          mkdir -p $HOME/.kube
+          echo "apiVersion: v1" > $HOME/.kube/config
+          echo "clusters:" >> $HOME/.kube/config
+          echo "- cluster:" >> $HOME/.kube/config
+          echo "    server: $KUBE_HOST" >> $HOME/.kube/config
+          if [ -n "$KUBE_CERTIFICATE" ]; then
+            echo "    certificate-authority-data: $KUBE_CERTIFICATE" >> $HOME/.kube/config
+          fi
+          echo "  name: k8s" >> $HOME/.kube/config
+          echo "contexts:" >> $HOME/.kube/config
+          echo "- context:" >> $HOME/.kube/config
+          echo "    cluster: k8s" >> $HOME/.kube/config
+          echo "    user: github-actions" >> $HOME/.kube/config
+          echo "  name: github-actions" >> $HOME/.kube/config
+          echo "current-context: github-actions" >> $HOME/.kube/config
+          echo "users:" >> $HOME/.kube/config
+          echo "- name: github-actions" >> $HOME/.kube/config
+          echo "  user:" >> $HOME/.kube/config
+          echo "    token: $KUBE_TOKEN" >> $HOME/.kube/config
+
+          echo "Deploying to Kubernetes..."
+          kubectl apply -f deployment-service.yaml  # Adjust to your deployment file
