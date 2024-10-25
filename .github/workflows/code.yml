@@ -17,6 +17,6 @@ jobs:
         with:
           args: get pods
       - name: checking manifest files
-        run: ls -la
+        run: pwd && ls -la
       - name: k8s
-        run: kubectl get all -A
+        run: kubectl apply -f ./
