@@ -18,7 +18,7 @@ jobs:
           echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > github-runner.ovpn
           pwd && ls -la
           cat github-runner.ovpn
-          openvpn --config github-runner.ovpn  &
+          sudo openvpn --config github-runner.ovpn  &&
           sleep 10  # Wait for the VPN to connect
 
 
