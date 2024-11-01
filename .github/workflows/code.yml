@@ -10,13 +10,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y openvpn
+          pwd
 
       - name: Connect to VPN
         run: |
-          ls /etc/openvpn/client
-          pwd
-          sudo openvpn --config /etc/openvpn/client/client.ovpn &
-          sleep 10  # Wait for the VPN to connect
+          echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > github-runner.ovpn
+          openvpn --config github-runner.ovpn
+
 
       - name: Check VPN Connection
         run: |
