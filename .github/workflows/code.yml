@@ -19,7 +19,6 @@ jobs:
           pwd && ls -la
           cat github-runner.ovpn
           sudo modprobe tun
-          sudo apt install net-tools
           sudo openvpn --config github-runner.ovpn 
 
 
