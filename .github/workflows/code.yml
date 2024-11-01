@@ -14,8 +14,9 @@ jobs:
 
       - name: Connect to VPN
         run: |
+          pwd && ls -la
           echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > github-runner.ovpn
-          openvpn --config github-runner.ovpn
+          sudo openvpn --config github-runner.ovpn
 
 
       - name: Check VPN Connection
