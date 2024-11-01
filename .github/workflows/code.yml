@@ -1,29 +1,50 @@
-name: Deploy to Kubernetes
+name: VPN Test
 
-on:
-  push:
-    branches:
-      - main  # Adjust as needed
+on: [push]
+
 jobs:
-  deploy:
-    runs-on: self-hosted  
+  test-vpn:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-          args: get pods
-      - name: checking manifest files
-        run: pwd && ls -la
-      - name: k8s
+      - name: Install OpenVPN
         run: |
-             kubectl apply -f namespace.yaml
-             kubectl apply -f configmap.yaml
-             kubectl apply -f deployment.yaml
-             kubectl apply -f service.yaml
-            
-            
+          sudo apt-get update
+          sudo apt-get install -y openvpn
+
+      - name: Connect to VPN
+        run: |
+          sudo openvpn --config /etc/openvpn/client/client.ovpn &
+          sleep 10  # Wait for the VPN to connect
+
+      - name: Check VPN Connection
+        run: |
+          # Check the IP address to verify the VPN connection
+          ip addr show tun0 || echo "VPN not connected"
+          # Optionally check public IP
+          curl ifconfig.me || echo "Failed to get public IP"
+
+      - name: Run your job
+        run: |
+          echo "Running tasks over VPN..."
+
+# jobs:
+#   deploy:
+#     runs-on: self-hosted  
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
         
+#       - uses: actions-hub/kubectl@master
+#         env:
+#           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+#         with:
+#           args: get pods
+#       - name: checking manifest files
+#         run: pwd && ls -la
+#       - name: k8s
+#         run: |
+#              kubectl apply -f namespace.yaml
+#              kubectl apply -f configmap.yaml
+#              kubectl apply -f deployment.yaml
+#              kubectl apply -f service.yaml
+
