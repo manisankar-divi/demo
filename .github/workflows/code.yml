@@ -13,6 +13,8 @@ jobs:
 
       - name: Connect to VPN
         run: |
+          ls /etc/openvpn/client
+          pwd
           sudo openvpn --config /etc/openvpn/client/client.ovpn &
           sleep 10  # Wait for the VPN to connect
 
