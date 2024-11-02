@@ -21,6 +21,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y openvpn
+      - name: Connect to vpn
+        timeout-minutes: 1
+        run: |
+          pwd && ls -la
+          echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > k8s-client.ovpn
+          sudo openvpn --config k8s-client.ovpn --log "vpn.log" --daemon
+          until ping -c1  vpn-private-ip; do echo wait for vpn; sleep 3; done
           
       - name: Connect to VPN
         run: |
