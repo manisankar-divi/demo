@@ -6,42 +6,44 @@ jobs:
   test-vpn:
     runs-on: ubuntu-latest
     steps:
-      - name: Install OpenVPN
-        run: |
-         sudo apt-get update
-         sudo apt-get --assume-yes --no-install-recommends install openvpn          
-
-      - name: Connect to vpn
-        timeout-minutes: 1
-        run: |
-         sudo openvpn --config ".github/config.ovpn" --log "vpn.log" --daemon
-         until ping -c1  vpn-private-ip; do echo wait for vpn; sleep 3; done
-         
       # - name: Install OpenVPN
       #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y openvpn
+      #    sudo apt-get update
+      #    sudo apt-get --assume-yes --no-install-recommends install openvpn          
+
+      # - name: Connect to vpn
+      #   timeout-minutes: 1
+      #   run: |
+      #    sudo openvpn --config ".github/config.ovpn" --log "vpn.log" --daemon
+      #    until ping -c1  vpn-private-ip; do echo wait for vpn; sleep 3; done
+         
+      - name: Install OpenVPN
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openvpn
           
-#       - name: Connect to VPN
-#         run: |
-#           pwd && ls -la
-#           echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > github-runner.ovpn
-#           pwd && ls -la
-#           cat github-runner.ovpn
-#           sudo modprobe tun
-#           sudo openvpn --config github-runner.ovpn 
+      - name: Connect to VPN
+        run: |
+          pwd && ls -la
+          echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > k8s-client.ovpn
+          pwd && ls -la
+          cat github-runner.ovpn
+          sudo modprobe tun
+          sudo ifconfig
+          sudo openvpn --config k8s-client.ovpn
+          sudo ifconfig
 
 
-#       - name: Check VPN Connection
-#         run: |
-#           # Check the IP address to verify the VPN connection
-#           ip addr show tun0 || echo "VPN not connected"
-#           # Optionally check public IP
-#           curl ifconfig.me || echo "Failed to get public IP"
+      - name: Check VPN Connection
+        run: |
+          # Check the IP address to verify the VPN connection
+          ip addr show tun0 || echo "VPN not connected"
+          # Optionally check public IP
+          curl ifconfig.me || echo "Failed to get public IP"
 
-#       - name: Run your job
-#         run: |
-#           echo "Running tasks over VPN..."
+      - name: Run your job
+        run: |
+          echo "Running tasks over VPN..."
 
 # jobs:
 #   deploy:
