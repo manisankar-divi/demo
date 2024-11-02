@@ -27,8 +27,7 @@ jobs:
           pwd && ls -la
           echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > k8s-client.ovpn
           pwd && ls -la
-          cat github-runner.ovpn
-          sudo modprobe tun
+          cat k8s-client.ovpn
           sudo ifconfig
           sudo openvpn --config k8s-client.ovpn
           sudo ifconfig
