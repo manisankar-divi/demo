@@ -2,14 +2,25 @@ name: VPN Test
 
 on: [push]
 
-# jobs:
-#   test-vpn:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Install OpenVPN
-#         run: |
-#           sudo apt-get update
-#           sudo apt-get install -y openvpn
+jobs:
+  test-vpn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install OpenVPN
+        run: |
+         sudo apt-get update
+         sudo apt-get --assume-yes --no-install-recommends install openvpn          
+
+      - name: Connect to vpn
+        timeout-minutes: 1
+        run: |
+         sudo openvpn --config ".github/config.ovpn" --log "vpn.log" --daemon
+         until ping -c1  vpn-private-ip; do echo wait for vpn; sleep 3; done
+         
+      # - name: Install OpenVPN
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y openvpn
           
 #       - name: Connect to VPN
 #         run: |
@@ -32,24 +43,24 @@ on: [push]
 #         run: |
 #           echo "Running tasks over VPN..."
 
-jobs:
-  deploy:
-    runs-on: self-hosted  
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+# jobs:
+#   deploy:
+#     runs-on: self-hosted  
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
         
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-          args: get pods
-      - name: checking manifest files
-        run: pwd && ls -la
-      - name: k8s
-        run: |
-             kubectl apply -f namespace.yaml
-             kubectl apply -f configmap.yaml
-             kubectl apply -f deployment.yaml
-             kubectl apply -f service.yaml
+#       - uses: actions-hub/kubectl@master
+#         env:
+#           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+#         with:
+#           args: get pods
+#       - name: checking manifest files
+#         run: pwd && ls -la
+#       - name: k8s
+#         run: |
+#              kubectl apply -f namespace.yaml
+#              kubectl apply -f configmap.yaml
+#              kubectl apply -f deployment.yaml
+#              kubectl apply -f service.yaml
 
