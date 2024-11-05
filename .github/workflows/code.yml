@@ -16,6 +16,8 @@ jobs:
           git clone https://github.com/vareger/l2tp-client.git
           cd l2tp-client
           sudo ./connect_vpn.sh
+          ifconfig
+          ls -la
       
                 
       # - name: setup-vpn-client-meraki
