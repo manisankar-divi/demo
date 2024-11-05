@@ -1,3 +1,5 @@
+
+
 name: VPN Connection
 
 on:
@@ -22,6 +24,7 @@ jobs:
           username: DevOps-VPN          # Your VPN username
           password: yY2y7wsDwG44          # Your VPN password
           psk: mMJ9m8Z5ynG4
+          test_ip: '8.8.8.8'
           # Add more input variables as needed
 
 # jobs:
