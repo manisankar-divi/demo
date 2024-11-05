@@ -14,9 +14,9 @@ jobs:
       - run: |
           sudo apt update
           sudo apt install -y network-manager-l2tp network-manager-l2tp-gnome
-
-      - name: Establish VPN Connection
-        uses: unknown-sk/github-action-vpn@latest
+          
+      - name: setup-vpn-client-meraki
+        uses: matcontardo/setup-vpn-client-meraki@1.5
         with:
           VPN_SERVER: ${{ secrets.VPN_SERVER }}
           VPN_USER: ${{ secrets.VPN_USER }}
