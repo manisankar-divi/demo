@@ -18,14 +18,14 @@ jobs:
           sudo ./connect_vpn.sh
       
                 
-      - name: setup-vpn-client-meraki
-        uses: matcontardo/setup-vpn-client-meraki@1.5
-        with:
-          server: 172.240.241.200  # Replace with your actual VPN server
-          username: DevOps-VPN          # Your VPN username
-          password: yY2y7wsDwG44          # Your VPN password
-          psk: mMJ9m8Z5ynG4
-          # Add more input variables as needed
+      # - name: setup-vpn-client-meraki
+      #   uses: matcontardo/setup-vpn-client-meraki@1.5
+      #   with:
+      #     server: 172.240.241.200  # Replace with your actual VPN server
+      #     username: DevOps-VPN          # Your VPN username
+      #     password: yY2y7wsDwG44          # Your VPN password
+      #     psk: mMJ9m8Z5ynG4
+      #     # Add more input variables as needed
 
 # jobs:
 #   deploy:
