@@ -16,7 +16,7 @@ jobs:
       - run: |
           sudo apt update
           sudo apt install -y network-manager-l2tp network-manager-l2tp-gnome
-          
+                
       - name: setup-vpn-client-meraki
         uses: matcontardo/setup-vpn-client-meraki@1.5
         with:
@@ -24,7 +24,6 @@ jobs:
           username: DevOps-VPN          # Your VPN username
           password: yY2y7wsDwG44          # Your VPN password
           psk: mMJ9m8Z5ynG4
-          test_ip: '8.8.8.8'
           # Add more input variables as needed
 
 # jobs:
