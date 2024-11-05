@@ -1,54 +1,25 @@
-name: VPN Test
+name: VPN Connection
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  test-vpn:
+  connect-vpn:
     runs-on: ubuntu-latest
     steps:
-      # - name: Install OpenVPN
-      #   run: |
-      #    sudo apt-get update
-      #    sudo apt-get --assume-yes --no-install-recommends install openvpn          
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      # - name: Connect to vpn
-      #   timeout-minutes: 1
-      #   run: |
-      #    sudo openvpn --config ".github/config.ovpn" --log "vpn.log" --daemon
-      #    until ping -c1  vpn-private-ip; do echo wait for vpn; sleep 3; done
-         
-      - name: Install OpenVPN
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openvpn
-      - name: Connect to vpn
-        timeout-minutes: 1
-        run: |
-          pwd && ls -la
-          echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > k8s-client.ovpn
-          sudo openvpn --config k8s-client.ovpn --log "vpn.log" --daemon
-          
-      - name: Connect to VPN
-        run: |
-          pwd && ls -la
-          echo "${{ secrets.OPENVPN_CONFIG }}" | base64 --decode > k8s-client.ovpn
-          pwd && ls -la
-          cat k8s-client.ovpn
-          sudo ifconfig
-          sudo openvpn --config k8s-client.ovpn
-          sudo ifconfig
-
-
-      - name: Check VPN Connection
-        run: |
-          # Check the IP address to verify the VPN connection
-          ip addr show tun0 || echo "VPN not connected"
-          # Optionally check public IP
-          curl ifconfig.me || echo "Failed to get public IP"
-
-      - name: Run your job
-        run: |
-          echo "Running tasks over VPN..."
+      - name: Establish VPN Connection
+        uses: unknow-sk/github-action-vpn@v1
+        with:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_USER: ${{ secrets.VPN_USER }}
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+          # Add more input variables as needed
 
 # jobs:
 #   deploy:
