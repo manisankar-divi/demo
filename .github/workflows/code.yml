@@ -11,9 +11,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - run: |
+          sudo apt update
+          sudo apt install -y network-manager-l2tp network-manager-l2tp-gnome
 
       - name: Establish VPN Connection
-        uses: unknow-sk/github-action-vpn@v1
+        uses: unknow-sk/github-action-vpn@v2
         with:
           VPN_SERVER: ${{ secrets.VPN_SERVER }}
           VPN_USER: ${{ secrets.VPN_USER }}
