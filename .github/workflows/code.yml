@@ -11,7 +11,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - run: |
-          sudo apt update
+          sudo apt-get update
+          sudo apt-get install strongswan
+          sudo systemctl status strongswan
           sudo apt install -y network-manager-l2tp network-manager-l2tp-gnome
           git clone https://github.com/vareger/l2tp-client.git
           cd l2tp-client
