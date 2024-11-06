@@ -53,6 +53,7 @@ jobs:
           echo "$KUBECONFIG_CONTENT" > ~/.kube/config
           chmod 600 ~/.kube/config
           export KUBECONFIG=~/.kube/config
+          ls .kube/config
 
 
       # - name: Disconnect VPN
