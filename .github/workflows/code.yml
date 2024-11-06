@@ -49,9 +49,11 @@ jobs:
         env:
           KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
         run: |
+          mkdir -p ~/.kube                # Ensure the .kube directory exists
           echo "$KUBECONFIG_CONTENT" > ~/.kube/config
           chmod 600 ~/.kube/config
           export KUBECONFIG=~/.kube/config
+
 
       # - name: Disconnect VPN
       #   if: always()
