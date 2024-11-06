@@ -1,4 +1,5 @@
 name: VPN Connection
+
 on:
   push:
     branches:
@@ -7,48 +8,38 @@ on:
 jobs:
   connect-vpn:
     runs-on: ubuntu-latest
+    env:
+      VPN_SERVER: ${{ secrets.VPN_SERVER }}
+      VPN_USER: ${{ secrets.VPN_USER }}
+      VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+      VPN_PSK: ${{ secrets.VPN_PSK }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - run: |
-          sudo apt-get update
-          sudo apt-get install strongswan
-          sudo systemctl status strongswan
-          sudo apt install -y network-manager-l2tp network-manager-l2tp-gnome
-          git clone https://github.com/vareger/l2tp-client.git
-          cd l2tp-client
-          sudo ./connect_vpn.sh
-          ifconfig
-          ls -la
-      
-                
-      # - name: setup-vpn-client-meraki
-      #   uses: matcontardo/setup-vpn-client-meraki@1.5
-      #   with:
-      #     server: 172.240.241.200  # Replace with your actual VPN server
-      #     username: DevOps-VPN          # Your VPN username
-      #     password: yY2y7wsDwG44          # Your VPN password
-      #     psk: mMJ9m8Z5ynG4
-      #     # Add more input variables as needed
 
-# jobs:
-#   deploy:
-#     runs-on: self-hosted  
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-        
-#       - uses: actions-hub/kubectl@master
-#         env:
-#           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-#         with:
-#           args: get pods
-#       - name: checking manifest files
-#         run: pwd && ls -la
-#       - name: k8s
-#         run: |
-#              kubectl apply -f namespace.yaml
-#              kubectl apply -f configmap.yaml
-#              kubectl apply -f deployment.yaml
-#              kubectl apply -f service.yaml
+      - name: Install VPN Packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq strongswan libcharon-extra-plugins
 
+      - name: Run VPN Connection Script
+        run: |
+          chmod +x ./l2tp.sh
+          ./l2tp.sh
+        env:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_USER: ${{ secrets.VPN_USER }}
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+
+      - name: Verify Connection
+        run: |
+          ip a
+          echo "Connected to VPN successfully!"
+
+      - name: Disconnect VPN
+        if: always()
+        run: |
+          sudo ipsec down my-l2tp || echo "VPN already disconnected."
+          echo "Disconnected VPN."
